@@ -2,203 +2,124 @@ package net.bingyan.android.wificar;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.VideoView;
 
-import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GetImageTask.ImageTaskListener, View.OnTouchListener {
 
     private static final String TAG = "MainActivity";
-    private Button button;
-    private VideoView videoView;
+    private Button showImageButton;
     private ImageView imageView;
+    private Button forward;
+    private Button left;
+    private Button right;
+    private Button backward;
+
+    private GetImageTask imageTask;
+    private SocketTask socketTask;
     private Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable getStream = new Runnable() {
-        @Override
-        public void run() {
-            int bufSize = 512 * 1024;
-            byte[] jpg_buf = new byte[bufSize];
-            int readSize = 4096;
-            byte[] buffer = new byte[readSize];
-            InputStream stream = null;
-
-            HttpURLConnection connection = null;
-            try {
-                connection = (HttpURLConnection) new URL("http://192.168.1.1:8080/?action=stream").openConnection();
-                boolean code = true;
-                while (code) {
-//                    code = false;
-                    Log.d(TAG, "get input ");
-                    stream = connection.getInputStream();
-
-                    int status = 0;
-                    int read;
-                    int jpg_count = 0;
-
-                    while ((read = stream.read(buffer, 0, readSize)) > 0) {
-                        for (int i = 0; i < read; i++) {
-                            switch (status) {
-                                //Content-Length:
-                                case 0:
-                                    if (buffer[i] == (byte) 'C') status++;
-                                    else status = 0;
-                                    break;
-                                case 1:
-                                    if (buffer[i] == (byte) 'o') status++;
-                                    else status = 0;
-                                    break;
-                                case 2:
-                                    if (buffer[i] == (byte) 'n') status++;
-                                    else status = 0;
-                                    break;
-                                case 3:
-                                    if (buffer[i] == (byte) 't') status++;
-                                    else status = 0;
-                                    break;
-                                case 4:
-                                    if (buffer[i] == (byte) 'e') status++;
-                                    else status = 0;
-                                    break;
-                                case 5:
-                                    if (buffer[i] == (byte) 'n') status++;
-                                    else status = 0;
-                                    break;
-                                case 6:
-                                    if (buffer[i] == (byte) 't') status++;
-                                    else status = 0;
-                                    break;
-                                case 7:
-                                    if (buffer[i] == (byte) '-') status++;
-                                    else status = 0;
-                                    break;
-                                case 8:
-                                    if (buffer[i] == (byte) 'L') status++;
-                                    else status = 0;
-                                    break;
-                                case 9:
-                                    if (buffer[i] == (byte) 'e') status++;
-                                    else status = 0;
-                                    break;
-                                case 10:
-                                    if (buffer[i] == (byte) 'n') status++;
-                                    else status = 0;
-                                    break;
-                                case 11:
-                                    if (buffer[i] == (byte) 'g') status++;
-                                    else status = 0;
-                                    break;
-                                case 12:
-                                    if (buffer[i] == (byte) 't') status++;
-                                    else status = 0;
-                                    break;
-                                case 13:
-                                    if (buffer[i] == (byte) 'h') status++;
-                                    else status = 0;
-                                    break;
-                                case 14:
-                                    if (buffer[i] == (byte) ':') status++;
-                                    else status = 0;
-                                    break;
-                                case 15:
-//                                    Log.d(TAG, "status " + status + "  " + buffer[i]);
-                                    if (buffer[i] == (byte)0xFF) status++;
-                                    jpg_count = 0;
-                                    jpg_buf[jpg_count++] = buffer[i];
-                                    break;
-                                case 16:
-//                                    Log.d(TAG, "status " + status + "  " + buffer[i]);
-                                    if (buffer[i] == (byte)0xD8) {
-                                        status++;
-                                        jpg_buf[jpg_count++] = buffer[i];
-                                    } else {
-                                        if (buffer[i] != (byte)0xFF) status = 15;
-                                    }
-                                    break;
-                                case 17:
-//                                    Log.d(TAG, "status " + status + "  " + buffer[i]);
-                                    jpg_buf[jpg_count++] = buffer[i];
-                                    if (buffer[i] == (byte)0xFF) status++;
-                                    if (jpg_count >= bufSize) status = 0;
-                                    break;
-                                case 18:
-//                                    Log.d(TAG, "status " + status + "  " + buffer[i]);
-                                    jpg_buf[jpg_count++] = buffer[i];
-                                    if (buffer[i] == (byte)0xD9) {
-                                        status = 0;
-                                        //jpg接收完成
-                                        Log.d(TAG, "get image");
-                                        final Bitmap bitmap = BitmapFactory.decodeByteArray(jpg_buf, 0, jpg_count);
-                                        handler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                imageView.setImageBitmap(bitmap);
-                                            }
-                                        });
-                                    } else {
-                                        if (buffer[i] != (byte)0xFF) status = 17;
-                                    }
-                                    break;
-                                default:
-                                    status = 0;
-                                    break;
-
-                            }
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (stream != null) {
-                        stream.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
-
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        button = (Button) findViewById(R.id.button);
-        videoView = (VideoView) findViewById(R.id.videoView);
-        imageView = (ImageView) findViewById(R.id.imageView);
+        initView();
 
-        button.setOnClickListener(new View.OnClickListener() {
+        imageTask = new GetImageTask("http://192.168.1.1:8080/?action=stream", this);
+        new Thread(imageTask).start();
+
+        socketTask = new SocketTask();
+
+    }
+
+    void initView() {
+        imageView = (ImageView) findViewById(R.id.imageView);
+        showImageButton = (Button) findViewById(R.id.showImage);
+
+        showImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                initVideo();
-                new Thread(getStream).start();
-//                Picasso.with(MainActivity.this).load("http://192.168.1.1:8080/?action=stream").into(imageView);
+                if (imageTask.isPause())
+                    imageTask.resume();
+                else imageTask.pause();
+            }
+        });
+
+        forward = (Button) findViewById(R.id.moveForward);
+        left = (Button) findViewById(R.id.moveLeft);
+        right = (Button) findViewById(R.id.moveRight);
+        backward = (Button) findViewById(R.id.moveBackward);
+
+        forward.setOnTouchListener(this);
+        left.setOnTouchListener(this);
+        right.setOnTouchListener(this);
+        backward.setOnTouchListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        imageTask.pause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        imageTask.stop();
+        socketTask.stop();
+    }
+
+    @Override
+    public void getImage(final byte[] imageData) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                imageView.setImageBitmap(bitmap);
             }
         });
     }
 
-    private void initVideo() {
-        videoView.setVideoURI(Uri.parse("http://192.168.1.1:8080/?action=stream"));
-        videoView.start();
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.moveForward:
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    socketTask.carForward();
+                } else if (event.getAction() == MotionEvent.ACTION_UP){
+                    socketTask.carStop();
+                }
+                break;
+            case R.id.moveLeft:
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    socketTask.carLeft();
+                } else if (event.getAction() == MotionEvent.ACTION_UP){
+                    socketTask.carStop();
+                }
+                break;
+            case R.id.moveRight:
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    socketTask.carRight();
+                } else if (event.getAction() == MotionEvent.ACTION_UP){
+                    socketTask.carStop();
+                }
+                break;
+            case R.id.moveBackward:
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    socketTask.carBackward();
+                } else if (event.getAction() == MotionEvent.ACTION_UP){
+                    socketTask.carStop();
+                }
+                break;
+        }
+        return true;
     }
 }
