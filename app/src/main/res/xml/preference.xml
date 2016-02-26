@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="@string/pref_key_wifi_ssid"
+        android:title="@string/pref_title_wifi_ssid"
+        android:defaultValue="@string/pref_default_wifi_ssid"
+        android:selectAllOnFocus="true"
+        android:capitalize="words"
+        android:singleLine="true"
+        android:maxLines="1"/>
+</PreferenceScreen>

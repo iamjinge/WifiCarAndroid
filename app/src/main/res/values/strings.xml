@@ -1,9 +1,4 @@
 <resources>
     <string name="app_name">WifiCar</string>
-    <string name="activity_main_pause">pause</string>
-    <string name="activity_main_resume">resume</string>
-    <string name="activity_main_forward">forward</string>
-    <string name="activity_main_left">left</string>
-    <string name="activity_main_right">right</string>
-    <string name="activity_main_backward">backward</string>
+
 </resources>

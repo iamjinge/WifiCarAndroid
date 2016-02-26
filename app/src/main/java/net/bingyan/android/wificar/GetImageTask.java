@@ -53,12 +53,13 @@ public class GetImageTask implements Runnable {
 
                 int imageDataSize = 524288; //512 * 1024
                 byte[] imageData = new byte[imageDataSize];
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[2048];
                 int status = 0;
                 int length;
                 int imageDataIndex = 0;
 
-                while (!pause && (length = stream.read(buffer)) > 0) {
+                while (!pause && (length = stream.read(buffer, 0, 2048)) > 0) {
+                    Log.d(TAG, length + "");
                     for (int i = 0; i < length; i++) {
                         switch (status) {
                             //Content-Length:
@@ -123,6 +124,7 @@ public class GetImageTask implements Runnable {
                                 else status = 0;
                                 break;
                             case 15:
+                                Log.d(TAG, "get");
                                 if (buffer[i] == (byte) 0xFF) status++;
                                 imageDataIndex = 0;
                                 imageData[imageDataIndex++] = buffer[i];
@@ -145,7 +147,7 @@ public class GetImageTask implements Runnable {
                                 if (buffer[i] == (byte) 0xD9) {
                                     status = 0;
                                     //jpg接收完成
-                                    Log.d(TAG, "get image");
+                                    Log.d(TAG, "get image " + imageDataIndex);
                                     if (listener != null)
                                         listener.getImage(imageData);
                                 } else {

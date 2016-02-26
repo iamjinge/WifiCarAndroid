@@ -5,7 +5,9 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -25,7 +27,6 @@ public class SocketTask {
     }
 
     public void carForward() {
-        Log.d(TAG, "add cmd forward");
         cmdQueue.add("ff000100ff");
     }
 
@@ -56,17 +57,17 @@ public class SocketTask {
                 while (!stop) {
                     String cmdStr = cmdQueue.poll();
                     if (!TextUtils.isEmpty(cmdStr)) {
-                        Log.d(TAG, "get cmd : " + cmdStr);
                         try {
                             Socket socket = new Socket("192.168.1.1", 2001);
+                            socket.setSoTimeout(5000);
                             Log.d(TAG, "connect");
                             byte[] cmd = hexStringToByteArray(cmdStr);
-                            Log.d(TAG, Arrays.toString(cmd));
+                            Log.d(TAG, "send : " + Arrays.toString(cmd));
                             socket.getOutputStream().write(cmd);
                             Thread.sleep(50);
                             byte[] input = new byte[32];
                             int i = socket.getInputStream().read(input);
-                            Log.d(TAG, i + "  " + Arrays.toString(input));
+                            Log.d(TAG, "get : " + i + " : " + Arrays.toString(input));
                             socket.close();
                         } catch (IOException e) {
                             e.printStackTrace();
