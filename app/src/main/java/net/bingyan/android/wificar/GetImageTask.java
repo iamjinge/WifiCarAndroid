@@ -149,7 +149,7 @@ public class GetImageTask implements Runnable {
                                     //jpg接收完成
                                     Log.d(TAG, "get image " + imageDataIndex);
                                     if (listener != null)
-                                        listener.getImage(imageData);
+                                        listener.getImage(imageData, imageDataIndex);
                                 } else {
                                     if (buffer[i] != (byte) 0xFF) status = 17;
                                 }
@@ -183,6 +183,6 @@ public class GetImageTask implements Runnable {
     }
 
     public interface ImageTaskListener {
-        void getImage(byte[] imageData);
+        void getImage(byte[] imageData, int dataLength);
     }
 }

@@ -12,6 +12,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -26,6 +27,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements GetImageTask.ImageTaskListener, View.OnTouchListener {
@@ -155,14 +160,25 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
     }
 
     @Override
-    public void getImage(final byte[] imageData) {
+    public void getImage(final byte[] imageData, final int dataLength) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, dataLength);
                 imageView.setImageBitmap(bitmap);
             }
         });
+//        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File f = new File(dir, System.currentTimeMillis() + ".jpg");
+//        try {
+//            FileOutputStream fos = new FileOutputStream(f);
+//            fos.write(imageData, 0 , dataLength);
+//            fos.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
