@@ -27,23 +27,23 @@ public class SocketTask {
     }
 
     public void carForward() {
-        cmdQueue.add("ff000100ff");
+        cmdQueue.add("62 01 7f 7f 00 00 00 65");
     }
 
     public void carBackward() {
-        cmdQueue.add("ff000200ff");
+        cmdQueue.add("62 01 88 88 00 00 00 65");
     }
 
     public void carRight() {
-        cmdQueue.add("ff000300ff");
+        cmdQueue.add("62 01 7f 00 00 00 00 65");
     }
 
     public void carLeft() {
-        cmdQueue.add("ff000400ff");
+        cmdQueue.add("62 01 00 7f 00 00 00 65");
     }
 
     public void carStop() {
-        cmdQueue.add("ff000000ff");
+        cmdQueue.add("62 01 00 00 00 00 00 65");
     }
 
     public void stop() {
@@ -82,6 +82,7 @@ public class SocketTask {
     }
 
     public byte[] hexStringToByteArray(String s) {
+        s = s.replace(" ", "");
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
