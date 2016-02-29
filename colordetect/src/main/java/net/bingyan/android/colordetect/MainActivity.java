@@ -1,15 +1,22 @@
 package net.bingyan.android.colordetect;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
+    private ImageView origin;
+    private ImageView result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,13 +26,26 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        origin = (ImageView) findViewById(R.id.imageOrigin);
+        result = (ImageView) findViewById(R.id.imageResult);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                start();
             }
         });
+    }
+
+    private void start() {
+        Bitmap originBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test2);
+        origin.setImageBitmap(originBitmap);
+
+        Log.d(TAG, "time");
+        Bitmap resultBitmap = BitmapUtil.decode(originBitmap);
+        result.setImageBitmap(resultBitmap);
+        Log.d(TAG, "get");
     }
 
     @Override
