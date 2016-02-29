@@ -3,6 +3,7 @@ package net.bingyan.android.colordetect;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +12,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,13 +45,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void start() {
-        Bitmap originBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test2);
+        Bitmap originBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test3);
         origin.setImageBitmap(originBitmap);
 
         Log.d(TAG, "time");
-        Bitmap resultBitmap = BitmapUtil.decode(originBitmap);
+        Bitmap resultBitmap = BitmapUtil.HSVDetect(originBitmap);
         result.setImageBitmap(resultBitmap);
         Log.d(TAG, "get");
+//        saveImage(resultBitmap);
+    }
+
+    private void saveImage(Bitmap bitmap) {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File f = new File(dir, System.currentTimeMillis() + ".png");
+        try {
+            FileOutputStream fos = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
