@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/WifiCar.iml" filepath="$PROJECT_DIR$/WifiCar.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/colordetect/colordetect.iml" filepath="$PROJECT_DIR$/colordetect/colordetect.iml" />
     </modules>
   </component>
 </project>
