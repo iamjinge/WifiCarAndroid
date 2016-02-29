@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="activity_main_pause">pause</string>
+    <string name="activity_main_pause">start</string>
     <string name="activity_main_resume">resume</string>
     <string name="activity_main_forward">forward</string>
     <string name="activity_main_left">left</string>

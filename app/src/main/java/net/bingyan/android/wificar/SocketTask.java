@@ -31,7 +31,7 @@ public class SocketTask {
     }
 
     public void carBackward() {
-        cmdQueue.add("62 01 88 88 00 00 00 65");
+        cmdQueue.add("62 01 80 80 00 00 00 65");
     }
 
     public void carRight() {

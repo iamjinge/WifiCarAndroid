@@ -38,10 +38,6 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
     private static final String TAG = "MainActivity";
     private Button showImageButton;
     private ImageView imageView;
-    private Button forward;
-    private Button left;
-    private Button right;
-    private Button backward;
 
     private GetImageTask imageTask;
     private SocketTask socketTask;
@@ -97,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
             }
             wifiManager.startScan();
         }
+
+        socketTask = new SocketTask();
     }
 
     void initView() {
@@ -112,19 +110,12 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
 
                 imageTask = new GetImageTask("http://192.168.1.1:8080/?action=stream", MainActivity.this);
                 new Thread(imageTask).start();
-                socketTask = new SocketTask();
             }
         });
 
-        forward = (Button) findViewById(R.id.moveForward);
-        left = (Button) findViewById(R.id.moveLeft);
-        right = (Button) findViewById(R.id.moveRight);
-        backward = (Button) findViewById(R.id.moveBackward);
-
-        forward.setOnTouchListener(this);
-        left.setOnTouchListener(this);
-        right.setOnTouchListener(this);
-        backward.setOnTouchListener(this);
+        NormalFragment normalFragment = new NormalFragment();
+        normalFragment.setSocketTask(socketTask);
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, normalFragment).commit();
     }
 
     void taskStart() {
@@ -161,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
 
     @Override
     public void getImage(final byte[] imageData, final int dataLength) {
+        saveImage(imageData, dataLength);
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -168,51 +160,24 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
                 imageView.setImageBitmap(bitmap);
             }
         });
-//        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File f = new File(dir, System.currentTimeMillis() + ".jpg");
-//        try {
-//            FileOutputStream fos = new FileOutputStream(f);
-//            fos.write(imageData, 0 , dataLength);
-//            fos.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    }
+
+    private void saveImage(byte[] imageData, int dataLength) {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File f = new File(dir, System.currentTimeMillis() + ".jpg");
+        try {
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(imageData, 0 , dataLength);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        switch (v.getId()) {
-            case R.id.moveForward:
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carForward();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
-                }
-                break;
-            case R.id.moveLeft:
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carLeft();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
-                }
-                break;
-            case R.id.moveRight:
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carRight();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
-                }
-                break;
-            case R.id.moveBackward:
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carBackward();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
-                }
-                break;
-        }
         return true;
     }
 
