@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "time");
         Bitmap resultBitmap = BitmapUtil.HSVDetect(originBitmap);
         result.setImageBitmap(resultBitmap);
+
         Log.d(TAG, "get");
 //        saveImage(resultBitmap);
     }

@@ -149,6 +149,12 @@ public class BitmapUtil {
 
         int index = 0;
         float[] HSV = new float[3];
+
+        int left = width;
+        int top = height;
+        int right = 0;
+        int bottom = 0;
+
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 // get current index in 2D-matrix
@@ -158,13 +164,28 @@ public class BitmapUtil {
                 // increase Saturation level
                 //HSV[0] = Hue
                 if (HSV[0] < 295 || HSV[0] > 333) {
-                    pixels[index] = 0xffffffff;
+//                    pixels[index] = 0xffffffff;
+                } else {
+                    if (x < left) left = x;
+                    if (x > right) right = x;
+                    if (y < top) top = y;
+                    if (y > bottom) bottom = y;
                 }
+                pixels[index] = 0x00000000;
             }
+        }
+        for (int y = top; y <= bottom; y++) {
+            pixels[y * width + left] = 0xff000000;
+            pixels[y * width + right] = 0xff000000;
+        }
+        for (int x = left; x <= right; x++) {
+            pixels[top * width + x] = 0xff000000;
+            pixels[bottom * width + x] = 0xff000000;
         }
         Log.d(TAG, "hsv get");
         small.setPixels(pixels, 0, width, 0, 0, width, height);
-        return small;
+        Bitmap result = Bitmap.createBitmap(pixels, 0, width, width,height, Bitmap.Config.ARGB_8888);
+        return result;
     }
 
 }
