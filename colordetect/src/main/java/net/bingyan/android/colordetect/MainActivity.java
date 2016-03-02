@@ -13,6 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -23,6 +27,22 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ImageView origin;
     private ImageView result;
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i(TAG, "OpenCV loaded successfully");
+//                    mOpenCvCameraView.enableView();
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
                 start();
             }
         });
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
     }
 
     private void start() {
@@ -49,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         origin.setImageBitmap(originBitmap);
 
         Log.d(TAG, "time");
-        Bitmap resultBitmap = BitmapUtil.HSVDetect(originBitmap);
+        Bitmap resultBitmap = BitmapUtil.openCVDetect(originBitmap);
         result.setImageBitmap(resultBitmap);
 
         Log.d(TAG, "get");

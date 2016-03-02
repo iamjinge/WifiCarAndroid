@@ -4,6 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -186,6 +191,14 @@ public class BitmapUtil {
         small.setPixels(pixels, 0, width, 0, 0, width, height);
         Bitmap result = Bitmap.createBitmap(pixels, 0, width, width,height, Bitmap.Config.ARGB_8888);
         return result;
+    }
+
+    public static Bitmap openCVDetect(Bitmap bitmap) {
+        Mat rgb = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8SC1);
+        Utils.bitmapToMat(bitmap, rgb);
+        Mat hsv = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8SC1);
+        Imgproc.cvtColor(rgb, hsv, Imgproc.COLOR_RGB2HSV);
+        return bitmap;
     }
 
 }
