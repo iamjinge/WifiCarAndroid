@@ -1,4 +1,4 @@
-package org.opencv.samples.colorblobdetect;
+package net.bingyan.android.colordetect;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -99,6 +99,10 @@ public class ColorBlobDetector {
                 mContours.add(contour);
             }
         }
+    }
+
+    public Mat getMask() {
+        return mMask;
     }
 
     public List<MatOfPoint> getContours() {

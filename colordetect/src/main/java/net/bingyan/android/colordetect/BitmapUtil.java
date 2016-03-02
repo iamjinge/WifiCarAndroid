@@ -5,11 +5,15 @@ import android.graphics.Color;
 import android.util.Log;
 
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * Created by Jinge on 2016/2/29.
@@ -189,7 +193,7 @@ public class BitmapUtil {
         }
         Log.d(TAG, "hsv get");
         small.setPixels(pixels, 0, width, 0, 0, width, height);
-        Bitmap result = Bitmap.createBitmap(pixels, 0, width, width,height, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(pixels, 0, width, width, height, Bitmap.Config.ARGB_8888);
         return result;
     }
 
@@ -198,7 +202,69 @@ public class BitmapUtil {
         Utils.bitmapToMat(bitmap, rgb);
         Mat hsv = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8SC1);
         Imgproc.cvtColor(rgb, hsv, Imgproc.COLOR_RGB2HSV);
-        return bitmap;
+        ColorBlobDetector detector = new ColorBlobDetector();
+        Scalar colorHsv = converScalarRgba2Hsv(new Scalar(135, 67, 116, 255));
+        Log.i(TAG, "hsv color: (" + colorHsv.val[0] + ", " + colorHsv.val[1] +
+                ", " + colorHsv.val[2] + ", " + colorHsv.val[3] + ")");
+        detector.setHsvColor(colorHsv);
+        detector.process(rgb);
+
+        List<MatOfPoint> contours = detector.getContours();
+        Log.e(TAG, "Contours count: " + contours.size());
+        Scalar CONTOUR_COLOR = new Scalar(135, 67, 116, 255);
+        Imgproc.drawContours(rgb, contours, -1, CONTOUR_COLOR);
+        Bitmap result = Bitmap.createBitmap(bitmap.getWidth() / 4, bitmap.getHeight() / 4, Bitmap.Config.ARGB_8888);
+
+        Mat tHsv = detector.getMask();
+
+        Log.d(TAG, tHsv.rows() + "  " + tHsv.cols() + "   " + result.getWidth() + "  " + result.getHeight());
+        Utils.matToBitmap(tHsv, result);
+
+        return result;
+    }
+
+    private static Scalar converScalarRgba2Hsv(Scalar rgbColor) {
+        Mat pointMatRgba = new Mat(1, 1, CvType.CV_8UC3, rgbColor);
+        Mat pointMatHsv = new Mat();
+        Imgproc.cvtColor(pointMatRgba, pointMatHsv, Imgproc.COLOR_RGB2HSV_FULL, 4);
+        return new Scalar(pointMatHsv.get(0, 0));
+    }
+
+    public static Bitmap ocDetectRGB(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        Mat srcRgb = new Mat(width, height, CvType.CV_8SC1);
+        Mat mHsvMat = new Mat();
+        Mat mMask = new Mat();
+
+        Scalar mLowerBound = new Scalar(0);
+        Scalar mUpperBound = new Scalar(0);
+        Scalar mColorRadius = new Scalar(50, 50, 50, 0);
+
+        Scalar rgbColor = new Scalar(135, 67, 116, 255);
+        Scalar hsvColor = converScalarRgba2Hsv(rgbColor);
+
+        double minH = (hsvColor.val[0] >= mColorRadius.val[0]) ? hsvColor.val[0] - mColorRadius.val[0] : 0;
+        double maxH = (hsvColor.val[0] + mColorRadius.val[0] <= 255) ? hsvColor.val[0] + mColorRadius.val[0] : 255;
+
+        mLowerBound.val[0] = minH;
+        mUpperBound.val[0] = maxH;
+        mLowerBound.val[1] = hsvColor.val[1] - mColorRadius.val[1];
+        mUpperBound.val[1] = hsvColor.val[1] + mColorRadius.val[1];
+        mLowerBound.val[2] = hsvColor.val[2] - mColorRadius.val[2];
+        mUpperBound.val[2] = hsvColor.val[2] + mColorRadius.val[2];
+        mLowerBound.val[3] = 0;
+        mUpperBound.val[3] = 255;
+
+        Utils.bitmapToMat(bitmap, srcRgb);
+        Imgproc.pyrDown(srcRgb, srcRgb);
+        Imgproc.cvtColor(srcRgb, mHsvMat, Imgproc.COLOR_RGB2HSV_FULL);
+        Core.inRange(mHsvMat, mLowerBound, mUpperBound, mMask);
+
+        Bitmap result = Bitmap.createBitmap(mMask.cols(), mMask.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mMask, result);
+
+        return result;
     }
 
 }
