@@ -7,4 +7,5 @@
     <string name="activity_main_right">right</string>
     <string name="activity_main_backward">backward</string>
     <string name="activity_main_action_setting">settings</string>
+    <string name="activity_main_action_choose">choose</string>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity_choose_color_red">RED</string>
+    <string name="activity_choose_color_yellow">yellow</string>
+    <string name="activity_choose_color_blue">blue</string>
+</resources>

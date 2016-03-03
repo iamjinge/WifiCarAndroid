@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jinge on 2016/2/25.
@@ -13,14 +15,28 @@ import java.net.URL;
 public class GetImageTask implements Runnable {
 
     private static final String TAG = "GetImageTask";
+    private static GetImageTask instance;
     private String url;
-    private ImageTaskListener listener;
+    private List<ImageTaskListener> listenerArrayList = new ArrayList<>();
     private boolean stop = false;
     private boolean pause = false;
 
-    public GetImageTask(String url, ImageTaskListener listener) {
+    public static GetImageTask getInstance() {
+        if (instance == null)
+            instance = new GetImageTask();
+        return instance;
+    }
+
+    public void setUrl(String url) {
         this.url = url;
-        this.listener = listener;
+    }
+
+    public void addListener(ImageTaskListener listener) {
+        listenerArrayList.add(listener);
+    }
+
+    public void removeListener(ImageTaskListener listener) {
+        listenerArrayList.remove(listener);
     }
 
     public void resume() {
@@ -34,6 +50,7 @@ public class GetImageTask implements Runnable {
     public void stop() {
         pause = true;
         stop = true;
+        listenerArrayList.clear();
     }
 
     public boolean isPause() {
@@ -59,7 +76,6 @@ public class GetImageTask implements Runnable {
                 int imageDataIndex = 0;
 
                 while (!pause && (length = stream.read(buffer, 0, 2048)) > 0) {
-                    Log.d(TAG, length + "");
                     for (int i = 0; i < length; i++) {
                         switch (status) {
                             //Content-Length:
@@ -124,7 +140,6 @@ public class GetImageTask implements Runnable {
                                 else status = 0;
                                 break;
                             case 15:
-                                Log.d(TAG, "get");
                                 if (buffer[i] == (byte) 0xFF) status++;
                                 imageDataIndex = 0;
                                 imageData[imageDataIndex++] = buffer[i];
@@ -148,8 +163,9 @@ public class GetImageTask implements Runnable {
                                     status = 0;
                                     //jpg接收完成
                                     Log.d(TAG, "get image " + imageDataIndex);
-                                    if (listener != null)
-                                        listener.getImage(imageData, imageDataIndex);
+                                    if (listenerArrayList.size() > 0)
+                                        for (ImageTaskListener listener : listenerArrayList)
+                                            listener.getImage(imageData, imageDataIndex);
                                 } else {
                                     if (buffer[i] != (byte) 0xFF) status = 17;
                                 }

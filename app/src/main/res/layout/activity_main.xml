@@ -6,16 +6,17 @@
     android:layout_height="match_parent"
     tools:context="net.bingyan.android.wificar.MainActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
+    <fragment
+        android:name="net.bingyan.android.wificar.ImageFragment"
+        android:id="@+id/imageViewFragment"
         android:layout_width="match_parent"
-        android:layout_height="280dp"/>
+        android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/showImage"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_below="@id/imageView"
+        android:layout_below="@id/imageViewFragment"
         android:text="@string/activity_main_pause"/>
 
     <FrameLayout

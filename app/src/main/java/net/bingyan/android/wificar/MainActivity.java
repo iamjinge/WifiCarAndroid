@@ -4,51 +4,57 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements GetImageTask.ImageTaskListener, View.OnTouchListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private Button showImageButton;
-    private ImageView imageView;
+    private ImageFragment imageFragment;
 
-    private GetImageTask imageTask;
     private SocketTask socketTask;
 
-    private Handler handler = new Handler(Looper.getMainLooper());
     private WifiManager wifiManager;
     private WifiReceiver wifiReceiver;
     private String targetWifi;
     private boolean targetConnect;
     private String preConfigSSID;
     private int targetConfigId;
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i(TAG, "OpenCV loaded successfully");
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,14 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
 
         init();
         initView();
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
+        } else {
+            Log.d(TAG, "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
 
     }
 
@@ -80,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
             if (TextUtils.equals(wifiInfo.getSSID(), targetWifi)) {
                 Log.d(TAG, "wifi connected to : " + wifiInfo.getSSID());
                 targetConnect = true;
-                taskStart();
             }
             List<WifiConfiguration> wifiConfigs = wifiManager.getConfiguredNetworks();
             for (WifiConfiguration config : wifiConfigs) {
@@ -98,18 +111,13 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
     }
 
     void initView() {
-        imageView = (ImageView) findViewById(R.id.imageView);
         showImageButton = (Button) findViewById(R.id.showImage);
+        imageFragment = (ImageFragment) getSupportFragmentManager().findFragmentById(R.id.imageViewFragment);
 
         showImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (imageTask.isPause())
-//                    imageTask.resume();
-//                else imageTask.pause();
-
-                imageTask = new GetImageTask("http://192.168.1.1:8080/?action=stream", MainActivity.this);
-                new Thread(imageTask).start();
+                start();
             }
         });
 
@@ -118,19 +126,19 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
         getSupportFragmentManager().beginTransaction().replace(R.id.container, normalFragment).commit();
     }
 
-    void taskStart() {
-//        imageTask = new GetImageTask("http://192.168.1.1:8080/?action=stream", this);
-//        new Thread(imageTask).start();
-//        socketTask = new SocketTask();
+    void start() {
+        GetImageTask getImageTask = GetImageTask.getInstance();
+        getImageTask.setUrl("http://192.168.1.1:8080/?action=stream");
+        new Thread(getImageTask).start();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (imageTask != null)
-            imageTask.stop();
         if (socketTask != null)
             socketTask.stop();
+
+        GetImageTask.getInstance().stop();
 
         unregisterReceiver(wifiReceiver);
 
@@ -151,37 +159,6 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
     }
 
     @Override
-    public void getImage(final byte[] imageData, final int dataLength) {
-        saveImage(imageData, dataLength);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, dataLength);
-                imageView.setImageBitmap(bitmap);
-            }
-        });
-    }
-
-    private void saveImage(byte[] imageData, int dataLength) {
-        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File f = new File(dir, System.currentTimeMillis() + ".jpg");
-        try {
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(imageData, 0 , dataLength);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return true;
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -191,6 +168,9 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (item.getItemId() == R.id.action_choose) {
+            startActivity(new Intent(this, ChooseColorActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -245,7 +225,6 @@ public class MainActivity extends AppCompatActivity implements GetImageTask.Imag
                         Log.d(TAG, "target  wifi connect success");
                         targetConnect = true;
                         Toast.makeText(context, "wifi connected", Toast.LENGTH_SHORT).show();
-                        taskStart();
                     }
                 }
             }
