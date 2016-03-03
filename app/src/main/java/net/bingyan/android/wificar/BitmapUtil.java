@@ -74,7 +74,7 @@ public class BitmapUtil {
     }
 
 
-    public static Mat getRegionOfColor(Bitmap bitmap, int color) {
+    public static Mat getRegionOfColor(Bitmap bitmap, int color, int colorRadius) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Mat srcRgb = new Mat(width, height, CvType.CV_8SC1);
@@ -83,7 +83,7 @@ public class BitmapUtil {
 
         Scalar mLowerBound = new Scalar(0);
         Scalar mUpperBound = new Scalar(0);
-        Scalar mColorRadius = new Scalar(25, 50, 50, 0);
+        Scalar mColorRadius = new Scalar(Color.red(colorRadius), Color.green(colorRadius), Color.blue(colorRadius), 0);
 
         Scalar rgbColor = new Scalar(Color.red(color), Color.green(color), Color.blue(color), 255);
         Scalar hsvColor = convertScalarRgba2Hsv(rgbColor);

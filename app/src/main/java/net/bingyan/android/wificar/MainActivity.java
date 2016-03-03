@@ -23,6 +23,7 @@ import android.widget.Toast;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Scalar;
 
 import java.util.List;
 
@@ -130,6 +131,12 @@ public class MainActivity extends AppCompatActivity {
         GetImageTask getImageTask = GetImageTask.getInstance();
         getImageTask.setUrl("http://192.168.1.1:8080/?action=stream");
         new Thread(getImageTask).start();
+
+//        Log.d(TAG, "0xffffffff " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(255, 255, 255, 255)));
+//
+//        Log.d(TAG, "0xffff0000 " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(255, 0, 0, 255)));
+//        Log.d(TAG, "0xff00ff00 " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(0, 255, 0, 255)));
+//        Log.d(TAG, "0xff0000ff " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(0, 0, 255, 255)));
     }
 
     @Override

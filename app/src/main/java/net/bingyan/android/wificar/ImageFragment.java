@@ -3,24 +3,21 @@ package net.bingyan.android.wificar;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import org.opencv.core.Scalar;
+
 /**
  * Created by Jinge on 2016/3/2.
  */
-public class ImageFragment extends AbstractImageFragment implements GetImageTask.ImageTaskListener {
+public class ImageFragment extends AbstractImageFragment {
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        GetImageTask.getInstance().addListener(this);
-    }
+    private static final String TAG = "ImageFragment";
 
     @Override
     protected Bitmap getShowBitmap(Bitmap bitmap) {

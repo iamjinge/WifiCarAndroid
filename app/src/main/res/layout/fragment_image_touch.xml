@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -15,23 +16,88 @@
         android:id="@+id/colorBtnGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <RadioButton
             android:id="@+id/redBtn"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="@string/activity_choose_color_red"/>
+            android:text="@string/activity_choose_color_red" />
 
         <RadioButton
             android:id="@+id/yellowBtn"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="@string/activity_choose_color_yellow"/>
+            android:text="@string/activity_choose_color_yellow" />
 
         <RadioButton
             android:id="@+id/blueBtn"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="@string/activity_choose_color_blue"/>
+            android:text="@string/activity_choose_color_blue" />
     </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/hText"
+            android:layout_width="64dp"
+            android:layout_height="32dp"
+            android:gravity="center_vertical"
+            android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            tools:text="h" />
+
+        <SeekBar
+            android:id="@+id/hSeek"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:max="255" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/sText"
+            android:layout_width="64dp"
+            android:layout_height="32dp"
+            android:gravity="center_vertical"
+            android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            tools:text="h" />
+
+        <SeekBar
+            android:id="@+id/sSeek"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:max="255" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/vText"
+            android:layout_width="64dp"
+            android:layout_height="32dp"
+            android:gravity="center_vertical"
+            android:textAppearance="@android:style/TextAppearance.Holo.Medium"
+            tools:text="h" />
+
+        <SeekBar
+            android:id="@+id/vSeek"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:max="255" />
+    </LinearLayout>
+
 
 </LinearLayout>
