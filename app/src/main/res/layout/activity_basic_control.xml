@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="net.bingyan.android.wificar.MainActivity">
+    tools:context="net.bingyan.android.wificar.ColorDetectActivity">
 
     <fragment
         android:id="@+id/imageViewFragment"
@@ -14,8 +14,8 @@
 
     <fragment
         android:id="@+id/controlFragment"
-        android:name="net.bingyan.android.wificar.NormalFragment"
+        android:name="net.bingyan.android.wificar.BasicControlFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

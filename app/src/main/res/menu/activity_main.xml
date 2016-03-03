@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_start"
+        android:title="start"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_settings"
-        android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/title_activity_settings"
-        app:showAsAction="always"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_choose"
-        android:icon="@android:drawable/ic_menu_call"
-        android:title="@string/activity_main_action_choose"
-        app:showAsAction="always"/>
+        android:title="set color"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_to_detect"
+        android:title="detect"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_basic_control"
+        android:title="basic"
+        app:showAsAction="never" />
 </menu>

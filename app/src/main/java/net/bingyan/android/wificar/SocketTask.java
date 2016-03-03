@@ -5,9 +5,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,13 +14,22 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class SocketTask {
     private static final String TAG = "SocketTask";
+    private static SocketTask instance;
     private Queue<String> cmdQueue = new LinkedBlockingQueue<>();
     private Runnable socketRunnable;
-
     private boolean stop = false;
 
-    public SocketTask() {
+    private SocketTask() {
         initRunnable();
+    }
+
+    public static SocketTask getInstance() {
+        if (instance == null)
+            instance = new SocketTask();
+        return instance;
+    }
+
+    public void start() {
         new Thread(socketRunnable).start();
     }
 
@@ -44,6 +51,10 @@ public class SocketTask {
 
     public void carStop() {
         cmdQueue.add("62 01 00 00 00 00 00 65");
+    }
+
+    public void addCode(String code) {
+        cmdQueue.add(code);
     }
 
     public void stop() {

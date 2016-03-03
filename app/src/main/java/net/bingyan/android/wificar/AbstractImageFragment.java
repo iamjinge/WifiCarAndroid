@@ -26,9 +26,15 @@ public abstract class AbstractImageFragment extends Fragment implements GetImage
     private Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         GetImageTask.getInstance().addListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        GetImageTask.getInstance().removeListener(this);
     }
 
     protected abstract Bitmap getShowBitmap(Bitmap bitmap);

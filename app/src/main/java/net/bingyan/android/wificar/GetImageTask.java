@@ -27,6 +27,11 @@ public class GetImageTask implements Runnable {
         return instance;
     }
 
+    public void startTask() {
+        this.url = "http://192.168.1.1:8080/?action=stream";
+        new Thread(this).start();
+    }
+
     public void setUrl(String url) {
         this.url = url;
     }

@@ -2,7 +2,6 @@ package net.bingyan.android.wificar;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,10 +9,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 /**
- * Created by Jinge on 2016/2/29.
+ * Created by Jinge on 2016/3/3.
  */
-public class NormalFragment extends AbstractControlFragment implements View.OnTouchListener {
-
+public class BasicControlFragment extends AbstractControlFragment implements View.OnTouchListener {
+    public static final String BASIC_FORWARD = "ff 00 01 00 ff";
+    public static final String BASIC_LEFT = "ff 00 00 04 ff";
+    public static final String BASIC_RIGHT = "ff 00 00 03 ff";
+    public static final String BASIC_BACKWARD = "ff 00 02 00 ff";
+    public static final String BASIC_STOP = "ff 00 00 00 ff";
     private Button forward;
     private Button left;
     private Button right;
@@ -40,30 +43,30 @@ public class NormalFragment extends AbstractControlFragment implements View.OnTo
         switch (v.getId()) {
             case R.id.moveForward:
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carForward();
+                    socketTask.addCode(BASIC_FORWARD);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
+                    socketTask.addCode(BASIC_STOP);
                 }
                 break;
             case R.id.moveLeft:
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carLeft();
+                    socketTask.addCode(BASIC_LEFT);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
+                    socketTask.addCode(BASIC_STOP);
                 }
                 break;
             case R.id.moveRight:
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carRight();
+                    socketTask.addCode(BASIC_RIGHT);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
+                    socketTask.addCode(BASIC_STOP);
                 }
                 break;
             case R.id.moveBackward:
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    socketTask.carBackward();
+                    socketTask.addCode(BASIC_BACKWARD);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    socketTask.carStop();
+                    socketTask.addCode(BASIC_STOP);
                 }
                 break;
         }

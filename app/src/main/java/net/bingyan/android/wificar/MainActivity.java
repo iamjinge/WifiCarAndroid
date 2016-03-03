@@ -16,24 +16,19 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Scalar;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private Button showImageButton;
     private ImageFragment imageFragment;
-
-    private SocketTask socketTask;
+    private NormalFragment controlFragment;
 
     private WifiManager wifiManager;
     private WifiReceiver wifiReceiver;
@@ -108,29 +103,16 @@ public class MainActivity extends AppCompatActivity {
             wifiManager.startScan();
         }
 
-        socketTask = new SocketTask();
     }
 
     void initView() {
-        showImageButton = (Button) findViewById(R.id.showImage);
         imageFragment = (ImageFragment) getSupportFragmentManager().findFragmentById(R.id.imageViewFragment);
-
-        showImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                start();
-            }
-        });
-
-        NormalFragment normalFragment = new NormalFragment();
-        normalFragment.setSocketTask(socketTask);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, normalFragment).commit();
+        controlFragment = (NormalFragment) getSupportFragmentManager().findFragmentById(R.id.controlFragment);
     }
 
     void start() {
-        GetImageTask getImageTask = GetImageTask.getInstance();
-        getImageTask.setUrl("http://192.168.1.1:8080/?action=stream");
-        new Thread(getImageTask).start();
+        GetImageTask.getInstance().startTask();
+        SocketTask.getInstance().start();
 
 //        Log.d(TAG, "0xffffffff " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(255, 255, 255, 255)));
 //
@@ -142,9 +124,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (socketTask != null)
-            socketTask.stop();
 
+        SocketTask.getInstance().stop();
         GetImageTask.getInstance().stop();
 
         unregisterReceiver(wifiReceiver);
@@ -173,12 +154,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        } else if (item.getItemId() == R.id.action_choose) {
-            startActivity(new Intent(this, ChooseColorActivity.class));
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_choose:
+                startActivity(new Intent(this, ChooseColorActivity.class));
+                break;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.action_start:
+                start();
+                break;
+            case R.id.action_to_detect:
+                startActivity(new Intent(this, ColorDetectActivity.class));
+                break;
+            case R.id.action_basic_control:
+                startActivity(new Intent(this, BasicControlActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

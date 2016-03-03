@@ -4,15 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import org.opencv.core.Scalar;
-
 /**
+ *
  * Created by Jinge on 2016/3/2.
  */
 public class ImageFragment extends AbstractImageFragment {
