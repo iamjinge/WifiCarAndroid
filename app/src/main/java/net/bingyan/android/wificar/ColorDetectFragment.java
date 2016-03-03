@@ -58,10 +58,10 @@ public class ColorDetectFragment extends ImageFragment {
             }
             Point center = new Point(sum.x / points.length, sum.y / points.length);
             double angle = Math.toDegrees(Math.atan2(960 - 3 * center.x, 1280));
-            Log.d(TAG, "detect : " + area + " " + center + "  " + (int) angle);
-
+            double distance = 3967.2 / Math.sqrt(area) - 7.2068;
+            Log.d(TAG, "detect : " + area + "  " + (int) angle + "  " + distance);
             DataCenter.aimAngle = (int) angle;
-            DataCenter.aimDistance = 0;
+            DataCenter.aimDistance = (int) distance;
             if (DataCenter.flagGetAim) {
                 SocketTask.getInstance().sendAim();
             }
