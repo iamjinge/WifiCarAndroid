@@ -25,6 +25,9 @@ public class ColorDetectFragment extends ImageFragment {
     private int color;
     private int radius;
 
+    private int distance;
+    private int angle;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -56,6 +59,12 @@ public class ColorDetectFragment extends ImageFragment {
             Point center = new Point(sum.x / points.length, sum.y / points.length);
             double angle = Math.toDegrees(Math.atan2(960 - 3 * center.x, 1280));
             Log.d(TAG, "detect : " + area + " " + center + "  " + (int) angle);
+
+            DataCenter.aimAngle = (int) angle;
+            DataCenter.aimDistance = 0;
+            if (DataCenter.flagGetAim) {
+                SocketTask.getInstance().sendAim();
+            }
 
             Bitmap r = BitmapUtil.drawRegion(bitmap, region, 0xff000000);
             return r;

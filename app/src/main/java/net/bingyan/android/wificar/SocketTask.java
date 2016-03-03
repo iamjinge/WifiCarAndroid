@@ -4,6 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Queue;
@@ -61,35 +63,74 @@ public class SocketTask {
         stop = true;
     }
 
+    public void sendAim() {
+        cmdQueue.add("62 03 " +
+                int2HexString(DataCenter.aimDistance, 4) +
+                int2HexString(DataCenter.aimAngle, 2) +
+                "00 00 65");
+    }
+
     public void initRunnable() {
         socketRunnable = new Runnable() {
             @Override
             public void run() {
-                while (!stop) {
-                    String cmdStr = cmdQueue.poll();
-                    if (!TextUtils.isEmpty(cmdStr)) {
-                        try {
-                            Socket socket = new Socket("192.168.1.1", 2001);
-                            socket.setSoTimeout(5000);
-                            Log.d(TAG, "connect");
+                Socket socket = null;
+                OutputStream outStream = null;
+                InputStream inStream = null;
+                try {
+                    socket = new Socket("192.168.1.1", 2001);
+                    socket.setSoTimeout(5000);
+                    outStream = socket.getOutputStream();
+                    inStream = socket.getInputStream();
+                    while (!stop) {
+                        byte[] input = new byte[8];
+                        int i = inStream.read(input);
+                        handleInput(input);
+                        Log.d(TAG, "get : " + i + " : " + Arrays.toString(input));
+
+                        String cmdStr = cmdQueue.poll();
+                        if (!TextUtils.isEmpty(cmdStr)) {
                             byte[] cmd = hexStringToByteArray(cmdStr);
                             Log.d(TAG, "send : " + Arrays.toString(cmd));
-                            socket.getOutputStream().write(cmd);
+                            outStream.write(cmd);
+                        }
+
+                        try {
                             Thread.sleep(50);
-                            byte[] input = new byte[32];
-                            int i = socket.getInputStream().read(input);
-                            Log.d(TAG, "get : " + i + " : " + Arrays.toString(input));
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (socket != null) socket.close();
+                        if (outStream != null) outStream.close();
+                        if (inStream != null) inStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
                 Log.d(TAG, "over");
             }
         };
+    }
+
+    private boolean handleInput(byte[] input) {
+        boolean inputValid = false;
+        if (input[0] == 0x62 && input[7] == 0x65) {
+            switch (input[1]) {
+                case DataCenter.CODE_GET_AIM:
+                    DataCenter.flagGetAim = true;
+                    break;
+                case DataCenter.CODE_SEND_AIM:
+                    DataCenter.flagGetAim = false;
+                    break;
+            }
+            inputValid = true;
+        }
+        return inputValid;
     }
 
     public byte[] hexStringToByteArray(String s) {
@@ -101,5 +142,12 @@ public class SocketTask {
                     + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
+    }
+
+    public String int2HexString(int i, int strLength) {
+        String str = Integer.toHexString(i);
+        if (str.length() > strLength) str = str.substring(str.length() - strLength);
+        else for (int j = str.length(); j < strLength; j++) str = "0" + str;
+        return str;
     }
 }
