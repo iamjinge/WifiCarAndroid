@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,15 @@ import android.view.ViewGroup;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-
-import java.util.List;
+import org.opencv.core.Point;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by Jinge on 2016/3/3.
  */
 public class ColorDetectFragment extends ImageFragment {
 
+    private static final String TAG = "ColorDetectFragment";
     private int color;
     private int radius;
 
@@ -42,8 +44,20 @@ public class ColorDetectFragment extends ImageFragment {
             Mat mat = BitmapUtil.getRegionOfColor(bitmap, color, radius);
             Bitmap b = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
             Utils.matToBitmap(mat, b);
-            List<MatOfPoint> matOfPoints = BitmapUtil.getContoursOfRegion(mat);
-            Bitmap r = BitmapUtil.drawRegion(bitmap, matOfPoints, 0xff000000);
+            MatOfPoint region = BitmapUtil.getMaxContourOfRegion(mat);
+            if (region == null) return bitmap;
+            double area = Imgproc.contourArea(region);
+            Point[] points = region.toArray();
+            Point sum = new Point(0, 0);
+            for (Point p : points) {
+                sum.x += p.x;
+                sum.y += p.y;
+            }
+            Point center = new Point(sum.x / points.length, sum.y / points.length);
+            double angle = Math.toDegrees(Math.atan2(960 - 3 * center.x, 1280));
+            Log.d(TAG, "detect : " + area + " " + center + "  " + (int) angle);
+
+            Bitmap r = BitmapUtil.drawRegion(bitmap, region, 0xff000000);
             return r;
         } else {
             return bitmap;

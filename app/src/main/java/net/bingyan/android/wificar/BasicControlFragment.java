@@ -13,8 +13,8 @@ import android.widget.Button;
  */
 public class BasicControlFragment extends AbstractControlFragment implements View.OnTouchListener {
     public static final String BASIC_FORWARD = "ff 00 01 00 ff";
-    public static final String BASIC_LEFT = "ff 00 00 04 ff";
-    public static final String BASIC_RIGHT = "ff 00 00 03 ff";
+    public static final String BASIC_LEFT = "ff 00 04 00 ff";
+    public static final String BASIC_RIGHT = "ff 00 03 00 ff";
     public static final String BASIC_BACKWARD = "ff 00 02 00 ff";
     public static final String BASIC_STOP = "ff 00 00 00 ff";
     private Button forward;

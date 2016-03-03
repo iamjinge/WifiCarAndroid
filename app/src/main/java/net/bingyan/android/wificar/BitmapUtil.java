@@ -143,12 +143,52 @@ public class BitmapUtil {
         return result;
     }
 
+    public static MatOfPoint getMaxContourOfRegion(Mat mask) {
+        Mat mDilatedMask = new Mat();
+        Mat mHierarchy = new Mat();
+        List<MatOfPoint> result = new ArrayList<MatOfPoint>();
+        List<MatOfPoint> allContours = new ArrayList<MatOfPoint>();
+
+        Imgproc.dilate(mask, mDilatedMask, new Mat());
+        Imgproc.findContours(mDilatedMask, allContours, mHierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        // Find max contour area
+        double maxArea = 0;
+        int index = -1;
+        for (int i = 0; i < allContours.size(); i++) {
+            MatOfPoint wrapper = allContours.get(i);
+            double area = Imgproc.contourArea(wrapper);
+            if (area > maxArea) {
+                maxArea = area;
+                index = i;
+            }
+        }
+        if (index == -1) return null;
+        MatOfPoint contour = allContours.get(index);
+        Core.multiply(contour, new Scalar(2, 2), contour);
+        return contour;
+    }
+
     public static Bitmap drawRegion(Bitmap bitmap, List<MatOfPoint> contours, int color) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Mat srcRgb = new Mat(width, height, CvType.CV_8UC1);
         Scalar rgbColor = new Scalar(Color.red(color), Color.green(color), Color.blue(color), Color.alpha(color));
         Utils.bitmapToMat(bitmap, srcRgb);
+        Imgproc.drawContours(srcRgb, contours, -1, rgbColor);
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(srcRgb, result);
+        return result;
+    }
+
+    public static Bitmap drawRegion(Bitmap bitmap, MatOfPoint contour, int color) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        Mat srcRgb = new Mat(width, height, CvType.CV_8UC1);
+        Scalar rgbColor = new Scalar(Color.red(color), Color.green(color), Color.blue(color), Color.alpha(color));
+        Utils.bitmapToMat(bitmap, srcRgb);
+        List<MatOfPoint> contours = new ArrayList<>();
+        contours.add(contour);
         Imgproc.drawContours(srcRgb, contours, -1, rgbColor);
         Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(srcRgb, result);
