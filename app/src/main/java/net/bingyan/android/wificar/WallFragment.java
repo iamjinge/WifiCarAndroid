@@ -18,7 +18,6 @@ public class WallFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_wall, container, false);
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
