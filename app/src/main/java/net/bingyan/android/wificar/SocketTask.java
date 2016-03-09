@@ -23,6 +23,7 @@ public class SocketTask {
 
     private SocketTask() {
         initRunnable();
+        stop = true;
     }
 
     public static SocketTask getInstance() {
@@ -32,7 +33,10 @@ public class SocketTask {
     }
 
     public void start() {
-        new Thread(socketRunnable).start();
+        if (stop) {
+            stop = false;
+            new Thread(socketRunnable).start();
+        }
     }
 
     public void carForward() {
@@ -126,6 +130,7 @@ public class SocketTask {
                         }
                     }
                 } catch (IOException e) {
+                    stop = true;
                     e.printStackTrace();
                 } finally {
                     try {

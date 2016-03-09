@@ -21,6 +21,10 @@ public class GetImageTask implements Runnable {
     private boolean stop = false;
     private boolean pause = false;
 
+    public GetImageTask() {
+        stop = true;
+    }
+
     public static GetImageTask getInstance() {
         if (instance == null)
             instance = new GetImageTask();
@@ -28,8 +32,12 @@ public class GetImageTask implements Runnable {
     }
 
     public void startTask() {
-        this.url = "http://192.168.1.1:8080/?action=stream";
-        new Thread(this).start();
+        if (stop) {
+            stop = false;
+            pause = false;
+            this.url = "http://192.168.1.1:8080/?action=stream";
+            new Thread(this).start();
+        }
     }
 
     public void setUrl(String url) {
