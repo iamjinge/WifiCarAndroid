@@ -64,6 +64,7 @@ public class SocketTask {
     }
 
     public void sendAim() {
+        cmdQueue.clear();
         cmdQueue.add("62 03 " +
                 int2HexString(DataCenter.aimDistance, 4) +
                 int2HexString(DataCenter.aimAngle, 2) +
@@ -74,44 +75,62 @@ public class SocketTask {
         socketRunnable = new Runnable() {
             @Override
             public void run() {
-                Socket socket = null;
-                OutputStream outStream = null;
-                InputStream inStream = null;
-                try {
-                    socket = new Socket("192.168.1.1", 2001);
-                    socket.setSoTimeout(5000);
-                    outStream = socket.getOutputStream();
-                    inStream = socket.getInputStream();
-                    while (!stop) {
-                        byte[] input = new byte[8];
-                        int i = inStream.read(input);
-                        handleInput(input);
-                        Log.d(TAG, "get : " + i + " : " + Arrays.toString(input));
+//                while (!stop) {
+                    Socket socket = null;
+                    OutputStream outStream = null;
+                    InputStream inStream = null;
+                    try {
+                        socket = new Socket("192.168.1.1", 2001);
+                        socket.setSoTimeout(5000);
+                        outStream = socket.getOutputStream();
+                        inStream = socket.getInputStream();
+                        while (!stop) {
+                            byte[] input = new byte[8];
+                            int available = inStream.available();
+                            if (available > 16) inStream.skip(available - 16);
+                            if (inStream.available() > 0) {
+                                int num = inStream.read(input);
+                                int i = 0;
+                                for (i = 0; i < 8; i++) if (input[i] == 0x62) break;
+                                if (i > 0) {
+                                    byte[] addition = new byte[i];
+                                    num += inStream.read(addition);
+                                    byte[] tmp = input.clone();
+                                    for (int index = i; index < 8; index++) {
+                                        if (i + index < 8)
+                                            input[index] = tmp[i + index];
+                                        else input[index] = addition[index + i - 8];
+                                    }
+                                }
+                                handleInput(input);
+                                Log.d(TAG, "get : " + num + " : " + Arrays.toString(input) + "remains " + inStream.available());
+                            }
 
-                        String cmdStr = cmdQueue.poll();
-                        if (!TextUtils.isEmpty(cmdStr)) {
-                            byte[] cmd = hexStringToByteArray(cmdStr);
-                            Log.d(TAG, "send : " + Arrays.toString(cmd));
-                            outStream.write(cmd);
+                            String cmdStr = cmdQueue.poll();
+                            if (!TextUtils.isEmpty(cmdStr)) {
+                                byte[] cmd = hexStringToByteArray(cmdStr);
+                                Log.d(TAG, "send : " + Arrays.toString(cmd));
+                                outStream.write(cmd);
+                            }
+
+                            try {
+                                Thread.sleep(50);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
-
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
                         try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
+                            if (socket != null) socket.close();
+                            if (outStream != null) outStream.close();
+                            if (inStream != null) inStream.close();
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (socket != null) socket.close();
-                        if (outStream != null) outStream.close();
-                        if (inStream != null) inStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+//                }
                 Log.d(TAG, "over");
             }
         };
@@ -123,6 +142,7 @@ public class SocketTask {
             switch (input[1]) {
                 case DataCenter.CODE_GET_AIM:
                     DataCenter.flagGetAim = true;
+                    Log.d(TAG, "try to get aim");
                     break;
                 case DataCenter.CODE_SEND_AIM:
                     DataCenter.flagGetAim = false;

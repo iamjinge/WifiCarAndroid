@@ -170,6 +170,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_basic_control:
                 startActivity(new Intent(this, BasicControlActivity.class));
                 break;
+            case R.id.action_to_code:
+                startActivity(new Intent(this, CodeControlActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

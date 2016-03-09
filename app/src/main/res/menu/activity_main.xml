@@ -24,4 +24,9 @@
         android:id="@+id/action_basic_control"
         android:title="basic"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_to_code"
+        android:title="code test"
+        app:showAsAction="never"/>
 </menu>

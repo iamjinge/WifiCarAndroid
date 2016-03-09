@@ -24,7 +24,8 @@
             android:label="@string/title_activity_settings" />
         <activity android:name=".ChooseColorActivity" />
         <activity android:name=".ColorDetectActivity" />
-        <activity android:name=".BasicControlActivity"></activity>
+        <activity android:name=".BasicControlActivity" />
+        <activity android:name=".CodeControlActivity"></activity>
     </application>
 
 </manifest>
