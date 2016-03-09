@@ -11,6 +11,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,8 +28,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private ImageFragment imageFragment;
-    private NormalFragment controlFragment;
+    private Fragment currentFragment;
+
+    private ManualFragment manualFragment;
+    private FreeFragment freeFragment;
+    private WallFragment wallFragment;
+    private BackToAimFragment backFragment;
 
     private WifiManager wifiManager;
     private WifiReceiver wifiReceiver;
@@ -106,19 +111,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void initView() {
-        imageFragment = (ImageFragment) getSupportFragmentManager().findFragmentById(R.id.imageViewFragment);
-        controlFragment = (NormalFragment) getSupportFragmentManager().findFragmentById(R.id.controlFragment);
+        manualFragment = new ManualFragment();
+        freeFragment = new FreeFragment();
+        wallFragment = new WallFragment();
+        backFragment = new BackToAimFragment();
+
+        currentFragment = manualFragment;
+        navigation();
     }
 
     void start() {
         GetImageTask.getInstance().startTask();
         SocketTask.getInstance().start();
+    }
 
-//        Log.d(TAG, "0xffffffff " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(255, 255, 255, 255)));
-//
-//        Log.d(TAG, "0xffff0000 " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(255, 0, 0, 255)));
-//        Log.d(TAG, "0xff00ff00 " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(0, 255, 0, 255)));
-//        Log.d(TAG, "0xff0000ff " + BitmapUtil.convertScalarRgba2Hsv(new Scalar(0, 0, 255, 255)));
+    void navigation() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.containerFrameLayout, currentFragment).commit();
     }
 
     @Override
@@ -155,6 +163,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_manual:
+                currentFragment = manualFragment;
+                navigation();
+                break;
+            case R.id.action_free:
+                currentFragment = freeFragment;
+                navigation();
+                break;
+            case R.id.action_wall:
+                currentFragment = wallFragment;
+                navigation();
+                break;
+            case R.id.action_back:
+                currentFragment = backFragment;
+                navigation();
+                break;
             case R.id.action_choose:
                 startActivity(new Intent(this, ChooseColorActivity.class));
                 break;

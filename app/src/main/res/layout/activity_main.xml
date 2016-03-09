@@ -6,16 +6,9 @@
     android:orientation="vertical"
     tools:context="net.bingyan.android.wificar.MainActivity">
 
-    <fragment
-        android:id="@+id/imageViewFragment"
-        android:name="net.bingyan.android.wificar.ImageFragment"
+    <FrameLayout
+        android:id="@+id/containerFrameLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <fragment
-        android:id="@+id/controlFragment"
-        android:name="net.bingyan.android.wificar.NormalFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

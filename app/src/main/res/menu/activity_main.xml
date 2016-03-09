@@ -5,6 +5,27 @@
         android:id="@+id/action_start"
         android:title="start"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_manual"
+        android:title="Manual"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_free"
+        android:title="Free"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_wall"
+        android:title="Wall"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_back"
+        android:title="Back"
+        app:showAsAction="never"/>
+
     <item
         android:id="@+id/action_settings"
         android:title="@string/title_activity_settings"

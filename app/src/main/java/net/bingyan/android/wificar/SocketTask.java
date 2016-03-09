@@ -61,6 +61,7 @@ public class SocketTask {
 
     public void stop() {
         stop = true;
+        instance = null;
     }
 
     public void sendAim() {
@@ -71,65 +72,70 @@ public class SocketTask {
                 "00 00 65");
     }
 
+    public void changeMode(int mode) {
+        cmdQueue.clear();
+        cmdQueue.add("62 10 " + int2HexString(mode, 2) + "00 00 00 00 65");
+    }
+
     public void initRunnable() {
         socketRunnable = new Runnable() {
             @Override
             public void run() {
 //                while (!stop) {
-                    Socket socket = null;
-                    OutputStream outStream = null;
-                    InputStream inStream = null;
-                    try {
-                        socket = new Socket("192.168.1.1", 2001);
-                        socket.setSoTimeout(5000);
-                        outStream = socket.getOutputStream();
-                        inStream = socket.getInputStream();
-                        while (!stop) {
-                            byte[] input = new byte[8];
-                            int available = inStream.available();
-                            if (available > 16) inStream.skip(available - 16);
-                            if (inStream.available() > 0) {
-                                int num = inStream.read(input);
-                                int i = 0;
-                                for (i = 0; i < 8; i++) if (input[i] == 0x62) break;
-                                if (i > 0) {
-                                    byte[] addition = new byte[i];
-                                    num += inStream.read(addition);
-                                    byte[] tmp = input.clone();
-                                    for (int index = i; index < 8; index++) {
-                                        if (i + index < 8)
-                                            input[index] = tmp[i + index];
-                                        else input[index] = addition[index + i - 8];
-                                    }
+                Socket socket = null;
+                OutputStream outStream = null;
+                InputStream inStream = null;
+                try {
+                    socket = new Socket("192.168.1.1", 2001);
+                    socket.setSoTimeout(5000);
+                    outStream = socket.getOutputStream();
+                    inStream = socket.getInputStream();
+                    while (!stop) {
+                        byte[] input = new byte[8];
+                        int available = inStream.available();
+                        if (available > 16) inStream.skip(available - 16);
+                        if (inStream.available() > 0) {
+                            int num = inStream.read(input);
+                            int i = 0;
+                            for (i = 0; i < 8; i++) if (input[i] == 0x62) break;
+                            if (i > 0) {
+                                byte[] addition = new byte[i];
+                                num += inStream.read(addition);
+                                byte[] tmp = input.clone();
+                                for (int index = i; index < 8; index++) {
+                                    if (i + index < 8)
+                                        input[index] = tmp[i + index];
+                                    else input[index] = addition[index + i - 8];
                                 }
-                                handleInput(input);
-                                Log.d(TAG, "get : " + num + " : " + Arrays.toString(input) + "remains " + inStream.available());
                             }
-
-                            String cmdStr = cmdQueue.poll();
-                            if (!TextUtils.isEmpty(cmdStr)) {
-                                byte[] cmd = hexStringToByteArray(cmdStr);
-                                Log.d(TAG, "send : " + Arrays.toString(cmd));
-                                outStream.write(cmd);
-                            }
-
-                            try {
-                                Thread.sleep(50);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            handleInput(input);
+                            Log.d(TAG, "get : " + num + " : " + Arrays.toString(input) + "remains " + inStream.available());
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
+
+                        String cmdStr = cmdQueue.poll();
+                        if (!TextUtils.isEmpty(cmdStr)) {
+                            byte[] cmd = hexStringToByteArray(cmdStr);
+                            Log.d(TAG, "send : " + Arrays.toString(cmd));
+                            outStream.write(cmd);
+                        }
+
                         try {
-                            if (socket != null) socket.close();
-                            if (outStream != null) outStream.close();
-                            if (inStream != null) inStream.close();
-                        } catch (IOException e) {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (socket != null) socket.close();
+                        if (outStream != null) outStream.close();
+                        if (inStream != null) inStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 //                }
                 Log.d(TAG, "over");
             }

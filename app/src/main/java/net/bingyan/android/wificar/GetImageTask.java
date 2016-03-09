@@ -56,6 +56,7 @@ public class GetImageTask implements Runnable {
         pause = true;
         stop = true;
         listenerArrayList.clear();
+        instance = null;
     }
 
     public boolean isPause() {
