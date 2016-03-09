@@ -3,17 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="net.bingyan.android.wificar.ManualFragment">
+    tools:context=".main.ManualFragment">
 
     <fragment
         android:id="@+id/imageViewFragment"
-        android:name="net.bingyan.android.wificar.ImageFragment"
+        android:name="net.bingyan.android.wificar.image.ImageFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <fragment
         android:id="@+id/controlFragment"
-        android:name="net.bingyan.android.wificar.NormalFragment"
+        android:name="net.bingyan.android.wificar.TouchControlFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.image;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
+
+import net.bingyan.android.wificar.GetImageTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;

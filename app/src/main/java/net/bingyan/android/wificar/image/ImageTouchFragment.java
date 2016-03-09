@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.image;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,6 +17,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import net.bingyan.android.wificar.R;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;

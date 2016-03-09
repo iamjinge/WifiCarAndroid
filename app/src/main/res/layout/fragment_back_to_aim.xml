@@ -2,11 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.bingyan.android.wificar.BackToAimFragment">
+    tools:context=".main.BackToAimFragment">
 
     <fragment
         android:id="@+id/colorDetectFragment"
-        android:name="net.bingyan.android.wificar.ColorDetectFragment"
+        android:name="net.bingyan.android.wificar.image.ColorDetectFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

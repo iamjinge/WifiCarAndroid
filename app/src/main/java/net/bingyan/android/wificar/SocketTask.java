@@ -81,6 +81,10 @@ public class SocketTask {
         cmdQueue.add("62 10 " + int2HexString(mode, 2) + "00 00 00 00 65");
     }
 
+    public void changeMotor(int left, int right) {
+        cmdQueue.add("62 01 " + int2HexString(left, 2) + int2HexString(right, 2) + "00 00 00 65");
+    }
+
     public void initRunnable() {
         socketRunnable = new Runnable() {
             @Override

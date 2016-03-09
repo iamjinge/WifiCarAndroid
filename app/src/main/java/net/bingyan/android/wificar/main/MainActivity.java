@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.main;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +18,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import net.bingyan.android.wificar.BasicControlActivity;
+import net.bingyan.android.wificar.ChooseColorActivity;
+import net.bingyan.android.wificar.CodeControlActivity;
+import net.bingyan.android.wificar.ColorDetectActivity;
+import net.bingyan.android.wificar.GetImageTask;
+import net.bingyan.android.wificar.R;
+import net.bingyan.android.wificar.SettingsActivity;
+import net.bingyan.android.wificar.SocketTask;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;

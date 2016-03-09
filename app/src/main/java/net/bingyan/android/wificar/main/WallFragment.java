@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.main;
 
 
 import android.os.Bundle;
@@ -6,6 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import net.bingyan.android.wificar.R;
+import net.bingyan.android.wificar.SocketTask;
 
 
 /**

@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.image;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import net.bingyan.android.wificar.R;
 
 /**
  *

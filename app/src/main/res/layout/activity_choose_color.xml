@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/imageViewFragment"
-        android:name="net.bingyan.android.wificar.ImageTouchFragment"
+        android:name="net.bingyan.android.wificar.image.ImageTouchFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

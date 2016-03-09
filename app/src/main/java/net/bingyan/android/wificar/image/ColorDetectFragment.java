@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.image;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -12,6 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import net.bingyan.android.wificar.DataCenter;
+import net.bingyan.android.wificar.R;
+import net.bingyan.android.wificar.SocketTask;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;

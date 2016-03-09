@@ -1,4 +1,4 @@
-package net.bingyan.android.wificar;
+package net.bingyan.android.wificar.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;

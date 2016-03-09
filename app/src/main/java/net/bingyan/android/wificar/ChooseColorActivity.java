@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import net.bingyan.android.wificar.image.ImageTouchFragment;
+
 public class ChooseColorActivity extends AppCompatActivity implements ImageTouchFragment.ColorChosenCallback {
     private static final String TAG = "ChooseColorActivity";
     private ImageTouchFragment imageTouchFragment;

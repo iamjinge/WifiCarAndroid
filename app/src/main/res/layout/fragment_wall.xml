@@ -2,11 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.bingyan.android.wificar.WallFragment">
+    tools:context=".main.WallFragment">
 
     <fragment
         android:id="@+id/imageViewFragment"
-        android:name="net.bingyan.android.wificar.ImageFragment"
+        android:name="net.bingyan.android.wificar.image.ImageFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
