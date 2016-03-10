@@ -2,6 +2,7 @@ package net.bingyan.android.wificar.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.util.Log;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -194,4 +195,76 @@ public class BitmapUtil {
         Utils.matToBitmap(srcRgb, result);
         return result;
     }
+
+    public static Bitmap colorDetect(Bitmap bitmap, int[] colors, int[] colorRadius, List<MatOfPoint> allContours) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        Mat srcRgb = new Mat(width, height, CvType.CV_8SC1);
+        Mat hsvMat = new Mat();
+        Mat[] masks = new Mat[colors.length];
+        for (int i = 0; i < colors.length; i++) masks[i] = new Mat();
+
+        Utils.bitmapToMat(bitmap, srcRgb);
+//        Imgproc.pyrDown(srcRgb, srcRgb);
+        Imgproc.cvtColor(srcRgb, hsvMat, Imgproc.COLOR_RGB2HSV_FULL);
+
+        for (int i = 0; i < colors.length; i++) {
+            int color = colors[i];
+            int radius = colorRadius[i];
+
+            Scalar mLowerBound = new Scalar(0);
+            Scalar mUpperBound = new Scalar(0);
+            Scalar mColorRadius = new Scalar(Color.red(radius), Color.green(radius), Color.blue(radius), 0);
+
+            Scalar rgbColor = new Scalar(Color.red(color), Color.green(color), Color.blue(color), 255);
+            Scalar hsvColor = convertScalarRgba2Hsv(rgbColor);
+
+            double minH = (hsvColor.val[0] >= mColorRadius.val[0]) ? hsvColor.val[0] - mColorRadius.val[0] : 0;
+            double maxH = (hsvColor.val[0] + mColorRadius.val[0] <= 255) ? hsvColor.val[0] + mColorRadius.val[0] : 255;
+
+            mLowerBound.val[0] = minH;
+            mUpperBound.val[0] = maxH;
+            mLowerBound.val[1] = hsvColor.val[1] - mColorRadius.val[1];
+            mUpperBound.val[1] = hsvColor.val[1] + mColorRadius.val[1];
+            mLowerBound.val[2] = hsvColor.val[2] - mColorRadius.val[2];
+            mUpperBound.val[2] = hsvColor.val[2] + mColorRadius.val[2];
+            mLowerBound.val[3] = 0;
+            mUpperBound.val[3] = 255;
+
+            Core.inRange(hsvMat, mLowerBound, mUpperBound, masks[i]);
+
+
+            Mat mDilatedMask = new Mat();
+            Mat mHierarchy = new Mat();
+            List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+
+            Imgproc.dilate(masks[i], mDilatedMask, new Mat());
+            Imgproc.findContours(mDilatedMask, contours, mHierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+            // Find max contour area
+            double maxArea = 0;
+            int index = -1;
+            for (int j = 0; j < contours.size(); j++) {
+                MatOfPoint wrapper = contours.get(j);
+                double area = Imgproc.contourArea(wrapper);
+                if (area > maxArea) {
+                    maxArea = area;
+                    index = j;
+                }
+            }
+            if (index == -1) return null;
+            MatOfPoint contour = contours.get(index);
+            allContours.add(contour);
+        }
+
+        Log.d("detect " , colors.length + "  " + allContours.size());
+
+        Scalar rgbColor = new Scalar(0, 0, 0, 255);
+        Imgproc.drawContours(srcRgb, allContours, -1, rgbColor, 3);
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(srcRgb, result);
+        return result;
+    }
+
+
 }

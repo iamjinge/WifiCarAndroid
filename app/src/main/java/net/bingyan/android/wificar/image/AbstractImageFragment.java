@@ -30,7 +30,8 @@ public abstract class AbstractImageFragment extends Fragment implements GetImage
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_GET_BITMAP:
-                    handleGetImage();
+                    Bundle bundle = msg.getData();
+                    handleGetImage(bundle.getByteArray("image_data"), bundle.getInt("data_length"));
                     break;
             }
         }
@@ -51,8 +52,9 @@ public abstract class AbstractImageFragment extends Fragment implements GetImage
     protected abstract Bitmap getShowBitmap(Bitmap bitmap);
 
     @Override
-    public void getImage(final byte[] imageData, final int dataLength) {
-        bitmap = BitmapFactory.decodeByteArray(imageData, 0, dataLength);
+    public void getImage(byte[] imageData, int dataLength) {
+        Bitmap tmp = BitmapFactory.decodeByteArray(imageData, 0, dataLength);
+        bitmap = getShowBitmap(tmp);
 
         Message msg = handler.obtainMessage(MSG_GET_BITMAP);
         Bundle bundle = new Bundle();
@@ -62,8 +64,7 @@ public abstract class AbstractImageFragment extends Fragment implements GetImage
         handler.sendMessage(msg);
     }
 
-    private void handleGetImage() {
-        bitmap = getShowBitmap(bitmap);
+    private void handleGetImage(byte[] imageData, int dataLength) {
         if (imageView != null && bitmap != null)
             imageView.setImageBitmap(bitmap);
     }

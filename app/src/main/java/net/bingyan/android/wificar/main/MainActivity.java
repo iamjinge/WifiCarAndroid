@@ -210,6 +210,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (currentFragment != manualFragment) {
+            currentFragment = manualFragment;
+            navigation();
+        } else
+            super.onBackPressed();
+    }
+
     private class WifiReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();

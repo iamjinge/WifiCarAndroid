@@ -17,11 +17,12 @@ import net.bingyan.android.wificar.DataCenter;
 import net.bingyan.android.wificar.R;
 import net.bingyan.android.wificar.SocketTask;
 
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jinge on 2016/3/3.
@@ -75,61 +76,73 @@ public class ColorDetectFragment extends ImageFragment {
     @Override
     protected Bitmap getShowBitmap(Bitmap bitmap) {
         if (colorYellow != 0) {
-            Mat matYellow = BitmapUtil.getRegionOfColor(bitmap, colorYellow, radiusYellow);
-            Bitmap bitmapYellow = Bitmap.createBitmap(matYellow.cols(), matYellow.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(matYellow, bitmapYellow);
-            MatOfPoint regionYellow = BitmapUtil.getMaxContourOfRegion(matYellow);
-            if (regionYellow == null) return bitmap;
-            double areaYellow = Imgproc.contourArea(regionYellow);
-            Point[] points = regionYellow.toArray();
-            Point sum = new Point(0, 0);
-            for (Point p : points) {
-                sum.x += p.x;
-                sum.y += p.y;
-            }
-            Point centerYellow = new Point(sum.x / points.length, sum.y / points.length);
-            double angleYellow = Math.toDegrees(Math.atan2(960 - 3 * centerYellow.x, 1280));
-            double distanceYellow = 3967.2 / Math.sqrt(areaYellow) - 7.2068;
-            Log.d(TAG, "detect yellow: " + areaYellow + "  " + (int) angleYellow + "  " + (int) distanceYellow);
+            if (bitmap != null) {
 
-            Mat matRed = BitmapUtil.getRegionOfColor(bitmap, colorRed, radiusRed);
-            Bitmap bitmapRed = Bitmap.createBitmap(matRed.cols(), matRed.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(matRed, bitmapRed);
-            MatOfPoint regionRed = BitmapUtil.getMaxContourOfRegion(matRed);
-            if (regionRed == null) return bitmap;
-            double areaRed = Imgproc.contourArea(regionRed);
-            points = regionRed.toArray();
-            sum = new Point(0, 0);
-            for (Point p : points) {
-                sum.x += p.x;
-                sum.y += p.y;
-            }
-            Point centerRed = new Point(sum.x / points.length, sum.y / points.length);
-            double angleRed = Math.toDegrees(Math.atan2(960 - 3 * centerRed.x, 1280));
-            double distanceRed = 3967.2 / Math.sqrt(areaRed) - 7.2068;
-            Log.d(TAG, "detect Red: " + areaRed + "  " + (int) angleRed + "  " + (int) distanceRed);
+                List<MatOfPoint> regions = new ArrayList<>();
+                Bitmap r = BitmapUtil.colorDetect(bitmap, new int[]{colorYellow, colorRed},
+                        new int[]{radiusYellow, radiusRed}, regions);
 
-            if (distanceRed < 30) {
-                DataCenter.aimAngle = (int) angleRed;
-                DataCenter.aimDistance = (int) distanceRed;
-            } else {
-                if (Math.abs(angleRed - angleYellow) < 5 && Math.abs(distanceRed - distanceYellow) / distanceYellow < 0.1) {
-                    int angleTmp = (int) ((angleRed + angleYellow) / 2);
-                    if (angleTmp < 0) angleTmp += 256;
-                    DataCenter.aimAngle = angleTmp;
-                    DataCenter.aimDistance = (int) ((distanceYellow + distanceRed) / 2);
-                } else {
+                if (regions.size() < 2) {
                     DataCenter.aimDistance = 1;
+                    if (aimText != null)
+                        aimText.setText("distance : " + DataCenter.aimDistance + "cm" + "    angle : " + DataCenter.aimAngle);
+                    if (DataCenter.flagGetAim) {
+                        SocketTask.getInstance().sendAim();
+                    }
+                    return bitmap;
                 }
-            }
-            if (aimText != null)
-                aimText.setText("distance : " + DataCenter.aimDistance + "cm" + "    angle : " + DataCenter.aimAngle);
-            if (DataCenter.flagGetAim) {
-                SocketTask.getInstance().sendAim();
+
+                MatOfPoint regionYellow = regions.get(0);
+                MatOfPoint regionRed = regions.get(1);
+
+                double areaYellow = Imgproc.contourArea(regionYellow);
+                Point[] points = regionYellow.toArray();
+                Point sum = new Point(0, 0);
+                for (Point p : points) {
+                    sum.x += p.x;
+                    sum.y += p.y;
+                }
+                Point centerYellow = new Point(sum.x / points.length, sum.y / points.length);
+                double angleYellow = Math.toDegrees(Math.atan2(960 - 3 * centerYellow.x, 1280));
+                double distanceYellow = 3967.2 / Math.sqrt(areaYellow) - 7.2068;
+                Log.d(TAG, "detect yellow: " + areaYellow + "  " + (int) angleYellow + "  " + (int) distanceYellow);
+
+                double areaRed = Imgproc.contourArea(regionRed);
+                points = regionRed.toArray();
+                sum = new Point(0, 0);
+                for (Point p : points) {
+                    sum.x += p.x;
+                    sum.y += p.y;
+                }
+                Point centerRed = new Point(sum.x / points.length, sum.y / points.length);
+                double angleRed = Math.toDegrees(Math.atan2(960 - 3 * centerRed.x, 1280));
+                double distanceRed = 3967.2 / Math.sqrt(areaRed) - 7.2068;
+                Log.d(TAG, "detect Red: " + areaRed + "  " + (int) angleRed + "  " + (int) distanceRed);
+
+                if (distanceRed < 30) {
+                    DataCenter.aimAngle = (int) angleRed;
+                    DataCenter.aimDistance = (int) distanceRed;
+                } else {
+                    if (Math.abs(angleRed - angleYellow) < 5 && Math.abs(distanceRed - distanceYellow) / distanceYellow < 0.1) {
+                        int angleTmp = (int) ((angleRed + angleYellow) / 2);
+                        if (angleTmp < 0) angleTmp += 256;
+                        DataCenter.aimAngle = angleTmp;
+                        DataCenter.aimDistance = (int) ((distanceYellow + distanceRed) / 2);
+                    } else {
+                        DataCenter.aimDistance = 1;
+                    }
+                }
+                if (aimText != null)
+                    aimText.setText("distance : " + DataCenter.aimDistance + "cm" + "    angle : " + DataCenter.aimAngle);
+                if (DataCenter.flagGetAim) {
+                    SocketTask.getInstance().sendAim();
+                }
+
+                return r;
+            } else {
+                return null;
             }
 
-            Bitmap r = BitmapUtil.drawRegion(bitmap, regionYellow, 0xff000000);
-            return r;
         } else {
             return bitmap;
         }
