@@ -176,7 +176,7 @@ public class GetImageTask implements Runnable {
                                 if (buffer[i] == (byte) 0xD9) {
                                     status = 0;
                                     //jpg接收完成
-                                    Log.d(TAG, "get image " + imageDataIndex);
+//                                    Log.d(TAG, "get image " + imageDataIndex);
                                     if (listenerArrayList.size() > 0)
                                         for (ImageTaskListener listener : listenerArrayList)
                                             listener.getImage(imageData, imageDataIndex);

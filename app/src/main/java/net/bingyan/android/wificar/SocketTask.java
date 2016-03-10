@@ -1,15 +1,19 @@
 package net.bingyan.android.wificar;
 
-import android.text.TextUtils;
 import android.util.Log;
+
+import net.bingyan.android.wificar.queue.AimCode;
+import net.bingyan.android.wificar.queue.BasicCode;
+import net.bingyan.android.wificar.queue.SocketCode;
+import net.bingyan.android.wificar.queue.CodeQueue;
+import net.bingyan.android.wificar.queue.ModeCode;
+import net.bingyan.android.wificar.queue.MotorCode;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by Jinge on 2016/2/25.
@@ -17,7 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SocketTask {
     private static final String TAG = "SocketTask";
     private static SocketTask instance;
-    private Queue<String> cmdQueue = new LinkedBlockingQueue<>();
+    private CodeQueue codeQueue = new CodeQueue();
     private Runnable socketRunnable;
     private boolean stop = false;
 
@@ -40,27 +44,27 @@ public class SocketTask {
     }
 
     public void carForward() {
-        cmdQueue.add("62 01 7f 7f 00 00 00 65");
+        codeQueue.add(new MotorCode(255, 255));
     }
 
     public void carBackward() {
-        cmdQueue.add("62 01 80 80 00 00 00 65");
+        codeQueue.add(new MotorCode(-255, -255));
     }
 
     public void carRight() {
-        cmdQueue.add("62 01 7f 00 00 00 00 65");
+        codeQueue.add(new MotorCode(255, 0));
     }
 
     public void carLeft() {
-        cmdQueue.add("62 01 00 7f 00 00 00 65");
+        codeQueue.add(new MotorCode(0, 255));
     }
 
     public void carStop() {
-        cmdQueue.add("62 01 00 00 00 00 00 65");
+        codeQueue.add(new MotorCode(0, 0));
     }
 
     public void addCode(String code) {
-        cmdQueue.add(code);
+        codeQueue.add(new BasicCode(code));
     }
 
     public void stop() {
@@ -69,21 +73,15 @@ public class SocketTask {
     }
 
     public void sendAim() {
-        cmdQueue.clear();
-        cmdQueue.add("62 03 " +
-                int2HexString(DataCenter.aimDistance, 4) +
-                int2HexString(DataCenter.aimAngle, 2) +
-                "00 00 65");
+        codeQueue.add(new AimCode(DataCenter.aimDistance, DataCenter.aimAngle));
     }
 
     public void changeMode(int mode) {
-        cmdQueue.clear();
-        cmdQueue.add("62 10 " + int2HexString(mode, 2) + "00 00 00 00 65");
+        codeQueue.add(new ModeCode(mode));
     }
 
     public void changeMotor(int left, int right) {
-        cmdQueue.clear();
-        cmdQueue.add("62 01 " + int2HexString(left, 2) + int2HexString(right, 2) + "00 00 00 65");
+        codeQueue.add(new MotorCode(left, right));
     }
 
     public void initRunnable() {
@@ -121,8 +119,9 @@ public class SocketTask {
                             Log.d(TAG, "get : " + num + " : " + Arrays.toString(input) + "remains " + inStream.available());
                         }
 
-                        String cmdStr = cmdQueue.poll();
-                        if (!TextUtils.isEmpty(cmdStr)) {
+                        SocketCode code = codeQueue.poll();
+                        if (code != null) {
+                            String cmdStr = code.getCode();
                             byte[] cmd = hexStringToByteArray(cmdStr);
                             Log.d(TAG, "send : " + Arrays.toString(cmd));
                             outStream.write(cmd);

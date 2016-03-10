@@ -27,12 +27,6 @@ public class TouchControlFragment extends AbstractControlFragment {
             @Override
             public void changeTo(int left, int right) {
                 Log.d(TAG, "change to : " + left + "  " + right);
-                if (right < 0) {
-                    right = 256 + right / 2;
-                } else {
-                    right = right / 2;
-                }
-                left = (left < 0 ? 256 : 0) + left / 2;
                 SocketTask.getInstance().changeMotor(left, right);
             }
         });
