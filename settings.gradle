@@ -1,3 +1,1 @@
-include ':app', ':colordetect'
-include ':openCVLibrary310'
-include ':openCVSamplecolorblobdetection'
+include ':app'

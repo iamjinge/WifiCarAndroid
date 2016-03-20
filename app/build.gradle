@@ -23,10 +23,18 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 
-
-    compile project(':openCVLibrary310')
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'com.android.support:support-v4:23.2.0'
+}
+
+repositories {
+    maven {
+        url "http://dl.bintray.com/steveliles/maven"
+    }
+}
+
+dependencies {
+    compile 'org.opencv:OpenCV-Android:3.1.0'
 }
